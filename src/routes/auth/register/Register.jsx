@@ -1,41 +1,49 @@
 import { Button, Checkbox, Form, Input, Typography, Divider, notification } from "antd";
 const { Title, Text } = Typography;
 
-import TelegramLoginButton from 'telegram-login-button'
-
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { GoogleLogin } from "@react-oauth/google";
 
 import axios from "../../../api";
 import { LOADING, REGISTER, ERROR } from "../../../redux/actions/action-types";
 
-const Register = () => {
+import TelegramLoginButton from 'telegram-login-button'
 
-  const { loading } = useSelector((state) => state);
-  const dispatch = useDispatch();
-  const [ form ] = Form.useForm();
+const Register = () => {
+  const navigate = useNavigate(); // to navigate
+  const { loading } = useSelector((state) => state); // to get the loading state
+  const dispatch = useDispatch(); // to dispatch actions
+  const [ form ] = Form.useForm(); // to clear the form
 
   const onFinish = async (values) => {
     try {
-      dispatch({ type: LOADING });
-      const { data } = await axios.post("/auth", values);
-      dispatch({ type: REGISTER, token: data.payload.token, user: data.payload.user });
+      dispatch({ type: LOADING }); // to start the loading
+      const { data } = await axios.post("/auth", values); // to send the register request
+      dispatch({ type: REGISTER, token: data.payload.token, user: data.payload.user }); // to dispatch the register action
 
+      // to navigate to the dashboard
+      if(data?.payload?.token){
+        navigate("/dashboard");
+      }
+
+      // to show a success notification
       notification.success({
         message: "Registration Successful",
         description: "You have registered successfully.",
       });
     } 
     catch (error) {
-      dispatch({ type: ERROR, error: error.message });
+      dispatch({ type: ERROR, error: error.message }); // to stop the loading
 
+      // to show an error notification
       notification.error({
         message: "Registration Failed",
         description: error.message || "Something went wrong. Please try again.",
       });
     }
 
+    // to clear the form
     form.resetFields();
   };
 
@@ -117,17 +125,18 @@ const Register = () => {
         <GoogleLogin
           disabled={loading}
           onSuccess={async (credentialResponse) => { 
-            const decode = credentialResponse.credential.split(".")[1];
-            const userData = JSON.parse(atob(decode));
-            console.log(userData);
+            const decode = credentialResponse.credential.split(".")[1]; // to decode the credential
+            const userData = JSON.parse(atob(decode)); // to parse the decoded credential
+
+            // to send the register request
             const user = {
               username: userData.email,
               password: userData.sub,
               first_name: userData.name
             }
-            const response = await axios.post("/auth", user);
+            const response = await axios.post("/auth", user); // to send the register request
             console.log(response.data);
-           }}
+          }}
           onError={() => { console.log("Login Failed") }}
         />
 

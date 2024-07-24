@@ -2,3 +2,8 @@
    color: #fff;
    background-color: #1677ff;
 }
+
+.ant-layout-sider-children{
+   display: flex;
+   flex-direction: column;
+}

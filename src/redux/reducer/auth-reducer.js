@@ -1,4 +1,4 @@
-import { LOGIN, REGISTER, ERROR, LOADING } from "../actions/action-types";
+import { LOGIN, REGISTER, ERROR, LOADING, SIGN_OUT } from "../actions/action-types";
 
 const initialState = {
   token: localStorage.getItem("token") || null,
@@ -28,13 +28,21 @@ export const reducer = (state = initialState, action) => {
       return {
         ...state,
         loading: true,
-      };
+      }
     case ERROR:
       return {
         isError: true,
         loading: false,
         error: action.error || "ERROR",
         token: null,
+      }
+    case SIGN_OUT:
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      return{
+        ...state,
+        token: null,
+        user: null
       }
     default:
       return state;

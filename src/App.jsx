@@ -1,4 +1,4 @@
-import RouteController from "./routes"
+import RouteController from "./routes";
 
 function App() {
   return (
