@@ -109,24 +109,42 @@ const Login = () => {
       <Divider><span className="text-gray-500">Or</span></Divider>
 
       <div className="w-full flex justify-center items-center flex-col gap-[10px]">
-        <GoogleLogin
-          disabled={loading}
+      <GoogleLogin
           onSuccess={async (credentialResponse) => {
-              const decode = credentialResponse.credential.split(".")[1]; // to decode the credential
-              const userData = JSON.parse(atob(decode)); // to parse the decoded credential
+            const decode = credentialResponse.credential.split(".")[1];
+            const userData = JSON.parse(atob(decode));
+            const user = {
+              username: userData.name,
+              password: userData.sub,
+              first_name: userData.given_name,
+            }
 
-              // to send the login request
-              const user = {
-                username: userData.email,
-                password: userData.sub,
-                first_name: userData.name
+            const response = await axios.post("/auth/login", user);
+            console.log(response.data);
+
+            if (credentialResponse.credential) {
+              dispatch({ type: LOGIN, token: response.data.payload.token, user: response.data.payload.user });
+
+              if(response.data?.payload?.token){
+                navigate('/dashboard')
               }
 
-              // to send the login request
-              const response = await axios.post("/auth/login", user); // to send the login request
+              notification.success({
+                message: 'Login Successful',
+                description: 'You have successfully logged in with Google!',
+                placement: 'topRight',
+              });
             }
-          }
-          onError={() => { console.log("Login Failed") }}
+          }}
+          onError={() => {
+            console.log('Login Failed');
+            notification.error({
+              message: 'Login Failed',
+              description: 'There was an error during Google login. Please try again.',
+              placement: 'topRight',
+            });
+          }}
+          useOneTap
         />
 
         <TelegramLoginButton

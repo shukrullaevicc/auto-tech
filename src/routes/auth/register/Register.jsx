@@ -8,22 +8,26 @@ import { GoogleLogin } from "@react-oauth/google";
 import axios from "../../../api";
 import { LOADING, REGISTER, ERROR } from "../../../redux/actions/action-types";
 
-import TelegramLoginButton from 'telegram-login-button'
+import TelegramLoginButton from "telegram-login-button";
 
 const Register = () => {
   const navigate = useNavigate(); // to navigate
   const { loading } = useSelector((state) => state); // to get the loading state
   const dispatch = useDispatch(); // to dispatch actions
-  const [ form ] = Form.useForm(); // to clear the form
+  const [form] = Form.useForm(); // to clear the form
 
   const onFinish = async (values) => {
     try {
       dispatch({ type: LOADING }); // to start the loading
       const { data } = await axios.post("/auth", values); // to send the register request
-      dispatch({ type: REGISTER, token: data.payload.token, user: data.payload.user }); // to dispatch the register action
+      dispatch({
+        type: REGISTER,
+        token: data.payload.token,
+        user: data.payload.user,
+      }); // to dispatch the register action
 
       // to navigate to the dashboard
-      if(data?.payload?.token){
+      if (data?.payload?.token) {
         navigate("/dashboard");
       }
 
@@ -32,8 +36,7 @@ const Register = () => {
         message: "Registration Successful",
         description: "You have registered successfully.",
       });
-    } 
-    catch (error) {
+    } catch (error) {
       dispatch({ type: ERROR, error: error.message }); // to stop the loading
 
       // to show an error notification
@@ -113,41 +116,95 @@ const Register = () => {
         <Checkbox>Remember me</Checkbox>
       </Form.Item>
 
-      <Form.Item
-        wrapperCol={{ span: 24 }}
-      >
-        <Button disabled={loading} className="w-full" type="primary" htmlType="submit" loading={loading}>Register</Button>
+      <Form.Item wrapperCol={{ span: 24 }}>
+        <Button
+          disabled={loading}
+          className="w-full"
+          type="primary"
+          htmlType="submit"
+          loading={loading}
+        >
+          Register
+        </Button>
       </Form.Item>
 
-      <Divider><span className="text-gray-500">Or</span></Divider>
+      <Divider>
+        <span className="text-gray-500">Or</span>
+      </Divider>
 
       <div className="w-full flex justify-center items-center flex-col gap-[10px]">
         <GoogleLogin
-          disabled={loading}
-          onSuccess={async (credentialResponse) => { 
-            const decode = credentialResponse.credential.split(".")[1]; // to decode the credential
-            const userData = JSON.parse(atob(decode)); // to parse the decoded credential
-
-            // to send the register request
+          onSuccess={async (credentialResponse) => {
+            const decode = credentialResponse.credential.split(".")[1];
+            const userData = JSON.parse(atob(decode));
             const user = {
-              username: userData.email,
+              username: userData.name,
               password: userData.sub,
-              first_name: userData.name
+              first_name: userData.given_name,
+            };
+
+            try {
+              const response = await axios.post("/auth", user);
+
+              dispatch({
+                type: REGISTER,
+                token: response.data.payload.token,
+                user: response.data.payload.user,
+              });
+
+              if (response.data?.payload?.token) {
+                navigate("/dashboard");
+              }
+
+              notification.success({
+                message: "Login Successful",
+                description: "You have successfully logged in with Google!",
+                placement: "topRight",
+              });
+            } catch (error) {
+              if (
+                error.response &&
+                error.response.data &&
+                error.response.data.message === "User already exists"
+              ) {
+                notification.error({
+                  message: "User Already Exists",
+                  description: "The user is already registered. Please log in.",
+                  placement: "topRight",
+                });
+              } else {
+                console.log("Login Failed", error);
+                notification.error({
+                  message: "Login Failed",
+                  description:
+                    "There was an error during Google login. Please try again.",
+                  placement: "topRight",
+                });
+              }
             }
-            const response = await axios.post("/auth", user); // to send the register request
-            console.log(response.data);
           }}
-          onError={() => { console.log("Login Failed") }}
+          onError={() => {
+            console.log("Login Failed");
+            notification.error({
+              message: "Login Failed",
+              description:
+                "There was an error during Google login. Please try again.",
+              placement: "topRight",
+            });
+          }}
+          useOneTap
         />
 
         <TelegramLoginButton
           disabled={loading}
           botName={import.meta.env.VITE_TELEGRAM_BOT_USERNAME}
-          dataOnauth={user => console.log(user)}
+          dataOnauth={(user) => console.log(user)}
         />
       </div>
 
-      <Text className="text-center mt-[16px] block">Already have an account? <Link to="/auth">Login</Link></Text>
+      <Text className="text-center mt-[16px] block">
+        Already have an account? <Link to="/auth">Login</Link>
+      </Text>
     </Form>
   );
 };

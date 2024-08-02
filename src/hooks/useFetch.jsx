@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from '../api';
 
-const useFetch = (ENDPOINT) => {
+const useFetch = (ENDPOINT, TRIGGER) => {
    const [data, setData] = useState(null)
    const [loading, setLoading] = useState(false)
    useEffect(() => {
@@ -20,7 +20,7 @@ const useFetch = (ENDPOINT) => {
       }
 
       loadData()
-   }, [ENDPOINT])
+   }, [ENDPOINT, TRIGGER])
 
    return [ data, loading ]
 }

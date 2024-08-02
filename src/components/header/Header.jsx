@@ -24,13 +24,7 @@ const HeaderComponent = ({ collapsed, handleToggleCollapsed }) => {
         icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
         style={{ fontSize: "16px", width: 64, height: 64, color: "#fff" }}/>
 
-      <div style={{ flex: 1, display: "flex", alignItems: "center", }}>
-        <Search
-          placeholder="Search..."
-          onSearch={handleSearch}
-          style={{ maxWidth: "400px", width: "100%", marginRight: "20px" }}
-        />
-      </div>
+      <div style={{ flex: 1, display: "flex", alignItems: "center", }}></div>
 
       <NavLink to="/dashboard/profile">
         <div className="bg-[#ff5722] ">
