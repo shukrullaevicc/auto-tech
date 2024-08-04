@@ -6,6 +6,8 @@ import { Loading } from "../utils";
 
 const Home = lazy(() => import("./home/Home"));
 const SinglePage = lazy(() => import("./single-page/SinglePage"));
+const Cart = lazy(() => import("./cart/Cart"));
+const Favorite = lazy(() => import("./favorite/Favorite"));
 const Private = lazy(() => import("./private/Private"));
 
 const Dashboard = lazy(() => import("./dashboard/Dashboard"));
@@ -70,6 +72,14 @@ const RouteController = () => {
            element: <Suspense fallback={<Loading />}><Register /></Suspense>
          }
        ]
+     },
+     {
+      path: "cart",
+      element: <Suspense fallback={<Loading />}><Cart /></Suspense>
+     },
+     {
+      path: "favorite",
+      element: <Suspense fallback={<Loading />}><Favorite /></Suspense>
      }
    ]);
  };

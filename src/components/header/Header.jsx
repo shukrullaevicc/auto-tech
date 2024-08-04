@@ -6,7 +6,6 @@ import useFetch from "../../hooks/useFetch";
 import { NavLink } from "react-router-dom";
 
 const { Header } = Layout;
-const { Search } = Input;
 
 const HeaderComponent = ({ collapsed, handleToggleCollapsed }) => {
   const [data] = useFetch("/auth/profile"); // fetch user data from backend using useFetch hook and store it in data variable
