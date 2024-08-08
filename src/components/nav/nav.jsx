@@ -47,7 +47,7 @@ const NavComponent = () => {
             </button>
           </Link>
           {isHovered && (
-            <div className="absolute top-full left-0 mt-2 bg-white shadow-lg rounded-lg w-64 z-10">
+            <div className="absolute top-full left-0 bg-gray-100 shadow-lg rounded-lg w-64 z-10">
               {cartItems.length > 0 ? (
                 cartItems.map((item, index) => (
                   <div
